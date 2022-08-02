@@ -8,7 +8,7 @@ def user_directory_path(instance, filename):
 
 
 class User(models.Model):
-    email = models.EmailField(unique=True)
+    mailbox = models.EmailField(unique=True, default='')
     username = models.CharField(max_length=20)
     real_name = models.CharField(max_length=20)
     description = models.CharField(max_length=255, default='')
