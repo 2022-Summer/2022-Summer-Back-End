@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from user.models import User
 from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -7,8 +7,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def register(request):
-    if User.exists():
-        return JsonResponse({'errno': 1002, 'msg': "该已注册"})
     if request.method == 'POST':
         mailbox = request.POST.get('mailbox')
         username = request.POST.get('username')
@@ -16,6 +14,8 @@ def register(request):
         password_1 = request.POST.get('password_1')
         password_2 = request.POST.get('password_2')
         users = User.objects.filter(mailbox=mailbox)
+        if users.exists():
+            return JsonResponse({'errno': 1002, 'msg': "该已注册"})
         if password_1 != password_2:
             return JsonResponse({'errno': 1003, 'msg': "两次输入的密码不一致"})
         if request.session.get('verification_code', 0) != request.POST.get('code'):
@@ -24,6 +24,9 @@ def register(request):
         return JsonResponse({'errno': 0, 'msg': "注册成功"})
     else:
         mailbox = request.GET.get('mailbox')
+        users = User.objects.filter(mailbox=mailbox)
+        if users.exists():
+            return JsonResponse({'errno': 1002, 'msg': "该已注册"})
         try:
             rand_str = sendMessage(mailbox)  # 发送邮件
             request.session['verification_code'] = rand_str  # 验证码存入session，用于做注册验证

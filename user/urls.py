@@ -1,5 +1,5 @@
 from django.urls import path
-from teamManagement.views import *
+from user.views import *
 
 urlpatterns = [
     path('register/', register),

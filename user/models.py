@@ -11,5 +11,6 @@ class User(models.Model):
     mailbox = models.EmailField(unique=True, default='')
     username = models.CharField(max_length=20)
     real_name = models.CharField(max_length=20)
+    password = models.CharField(max_length=20, default='')
     description = models.CharField(max_length=255, default='')
     headshot = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
