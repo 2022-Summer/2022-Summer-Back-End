@@ -95,3 +95,33 @@ def password(request):
             return JsonResponse({'errno': 1003, 'msg': "发送验证码失败"})
         return JsonResponse({'errno': 0, 'msg': "发送验证码成功"})
 
+
+@csrf_exempt
+def info(request):
+    user_id = int(request.session.get('id', 0))
+    if user_id == 0:
+        return JsonResponse({'errno': 3001, 'msg': "用户未登录"})
+    user = User.objects.get(id=user_id)
+    if request.method == 'POST':
+        if request.POST.get('username'):
+            user.username = request.POST.get('username')
+        if request.POST.get('description'):
+            user.description = request.POST.get('description')
+        if request.POST.get('name'):
+            user.real_name = request.POST.get('name')
+        if request.POST.get('sex'):
+            user.sex = request.POST.get('sex')
+        if request.FILES.get('headshot'):
+            user.headshot = request.FILES.get('headshot')
+        user.save()
+        return JsonResponse({'errno': 0, 'msg': "更改个人信息成功"})
+    else:
+        data = {
+            'mailbox': user.mailbox,
+            'username': user.username,
+            'real_name': user.real_name,
+            'description': user.description,
+            'sex': user.sex,
+            'headshot': user.photo_url()
+        }
+        return JsonResponse({'errno': 0, 'data': data})

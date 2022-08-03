@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'teamManagement',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -83,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
         'NAME': 'moshu',  # 数据库名，先前创建的
         'USER': 'root',     # 用户名，可以自己创建用户
-        'PASSWORD': '******',  # 密码
+        'PASSWORD': 'jyy13575305668',  # 密码
         'HOST': 'localhost',  # mysql服务所在的主机ip
         'PORT': '3306',         # mysql服务端口
     }

@@ -13,4 +13,5 @@ class User(models.Model):
     real_name = models.CharField(max_length=20)
     password = models.CharField(max_length=20, default='')
     description = models.CharField(max_length=255, default='')
+    sex = models.CharField(max_length=5, default='')
     headshot = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
