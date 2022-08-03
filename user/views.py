@@ -24,6 +24,7 @@ def register(request):
         return JsonResponse({'errno': 0, 'msg': "注册成功"})
     else:
         mailbox = request.GET.get('mailbox')
+        print(mailbox)
         users = User.objects.filter(mailbox=mailbox)
         if users.exists():
             return JsonResponse({'errno': 1002, 'msg': "该已注册"})
@@ -122,6 +123,7 @@ def info(request):
             'real_name': user.real_name,
             'description': user.description,
             'sex': user.sex,
+            'password': user.password,
             'headshot': user.photo_url()
         }
         return JsonResponse({'errno': 0, 'data': data})
