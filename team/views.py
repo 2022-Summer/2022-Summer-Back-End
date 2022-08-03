@@ -31,7 +31,7 @@ def member_info(request):
             'name': x.real_name,
             'username': x.username,
             'email': x.mailbox,
-            'status': Membership.objects.get(team=team, user=x),
+            'status': Membership.objects.get(team=team, user=x).status,
             'description': x.description,
         } for x in team.members.all()]
         mailbox = request.session.get('mailbox', 0)
