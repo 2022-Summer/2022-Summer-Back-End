@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
         'NAME': 'moshu',  # 数据库名，先前创建的
         'USER': 'root',     # 用户名，可以自己创建用户
-        'PASSWORD': 'jyy13575305668',  # 密码
+        'PASSWORD': '',  # 密码
         'HOST': 'localhost',  # mysql服务所在的主机ip
         'PORT': '3306',         # mysql服务端口
     }
@@ -166,7 +166,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'# 发送邮件配�
 EMAIL_HOST = 'smtp.qq.com'# 服务器名称
 EMAIL_PORT = 25# 服务端口
 EMAIL_HOST_USER = '1030519668@qq.com' # 填写自己邮箱
-EMAIL_HOST_PASSWORD = 'kcxtdzsbtulqbfba'# 在邮箱中设置的客户端授权密码
+EMAIL_HOST_PASSWORD = ''# 在邮箱中设置的客户端授权密码
 EMAIL_FROM = '墨书'# 收件人看到的发件人
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_USE_TLS = True   #是否使用TLS安全传输协议
