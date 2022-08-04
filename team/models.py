@@ -21,4 +21,5 @@ class Project(models.Model):
     title = models.CharField(max_length=20)
     start_time = models.DateTimeField(auto_now_add=True)
     leader = models.ForeignKey(User, on_delete=models.CASCADE)
+    description = models.CharField(max_length=255, default='')
     recycled = models.BooleanField(default=False)

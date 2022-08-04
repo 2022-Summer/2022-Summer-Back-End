@@ -107,6 +107,7 @@ def project(request):
             'title': x.title,
             'startTime': x.startTime,
             'leader': x.leader,
+            'description': x.description,
         } for x in Project.objects.filter(team=team, recycled=False)]
         return JsonResponse({'errno': 0, 'msg': "获取项目信息成功", 'projects': projects})
 
