@@ -55,6 +55,7 @@ def create(request):
         return JsonResponse({'errno': 0, 'msg': "创建团队成功"})
 
 
+@csrf_exempt
 def invite(request):
     if request.method == 'POST':
         team_id = request.POST.get('teamid', 0)
@@ -79,6 +80,7 @@ def invite(request):
         return JsonResponse({'errno': 8003, ',msg': "请求方式错误"})
 
 
+@csrf_exempt
 def admin(request):
     if request.method == 'POST':
         op = request.POST.get('op', 0)
@@ -94,6 +96,7 @@ def admin(request):
         return JsonResponse({'errno': 0, 'msg': "更改成功"})
 
 
+@csrf_exempt
 def project(request):
     if request.method == 'POST':
         pass
@@ -108,6 +111,7 @@ def project(request):
         return JsonResponse({'errno': 0, 'msg': "获取项目信息成功", 'projects': projects})
 
 
+@csrf_exempt
 def recycle(request):
     if request.method == 'POST':
         team_id = request.POST.get('teamid', 0)
@@ -126,8 +130,9 @@ def recycle(request):
     else:
         team_id = request.GET.get('teamid')
         team = Team.objects.get(id=team_id)
-        recycle = [{
+        recycles = [{
             'title': x.title,
             'startTime': x.startTime,
             'leader': x.leader,
         } for x in Project.objects.filter(team=team, recycled=True)]
+        return JsonResponse({'errno': 0, 'msg': "获取项目信息成功", 'Recycle': recycles})
