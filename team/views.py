@@ -60,9 +60,9 @@ def invite(request):
     if request.method == 'POST':
         team_id = request.POST.get('teamid', 0)
         mailbox = request.POST.get('email', '')
-        op = request.POST.get('op', 0)
+        op = int(request.POST.get('op', 0))
         if not User.objects.filter(mailbox=mailbox).exists():
-            JsonResponse({'errno': 8001, 'msg': "该成员不存在"})
+            return JsonResponse({'errno': 8001, 'msg': "该成员不存在"})
         user = User.objects.get(mailbox=mailbox)
         mailbox = request.session.get('mailbox', '')
         invitor = User.objects.get(mailbox=mailbox)
@@ -79,7 +79,10 @@ def invite(request):
             return JsonResponse({'errno': 0, 'msg': "已发送邀请"})
         elif op == 1:
             membership = Membership.objects.get(team=team, user=user)
-            membership.delete()
+            if membership.status == '发起人':
+                team.delete()
+            else:
+                membership.delete()
             return JsonResponse({'errno': 0, 'msg': "已成功移除"})
     else:
         return JsonResponse({'errno': 8003, ',msg': "请求方式错误"})

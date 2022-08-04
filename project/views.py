@@ -71,3 +71,15 @@ def download(request):
         doc = Document.objects.get(id=doc_id)
         return FileResponse(open(str(doc.file), 'rb'), as_attachment=True)
 
+
+@csrf_exempt
+def real_name(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('projectid', 0)
+        new_name = request.POST.get('newname', '')
+        print(project_id)
+        project = Project.objects.get(id=project_id)
+        if new_name:
+            project.title = new_name
+            project.save()
+        return JsonResponse({'errno': 0, 'msg': "重命名成功"})

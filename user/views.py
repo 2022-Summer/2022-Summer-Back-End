@@ -47,7 +47,7 @@ def login(request):
             if user.password == password:
                 request.session['mailbox'] = mailbox
                 request.session['username'] = user.username
-                return JsonResponse({'errno': 0, 'msg': "登录成功", 'username': user.username})
+                return JsonResponse({'errno': 0, 'msg': "登录成功", 'username': user.username, 'mailbox': mailbox})
             else:
                 return JsonResponse({'errno': 2002, 'msg': "密码错误"})
         else:
