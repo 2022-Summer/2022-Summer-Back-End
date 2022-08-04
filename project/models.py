@@ -5,8 +5,7 @@ from user.models import User
 
 
 def project_directory_path(instance, filename):
-    return 'team_{0}/project_{1}/{2}'.format(instance.project.team.id, instance.project_id, filename)
-
+    return 'resource/team_{0}/project_{1}/{2}'.format(instance.project.team.id, instance.project_id, filename)
 
 
 class Word(models.Model):
