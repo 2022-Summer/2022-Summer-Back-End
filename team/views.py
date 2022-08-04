@@ -42,7 +42,7 @@ def member_info(request):
 
 
 @csrf_exempt
-def create(request):
+def found(request):
     if request.method == 'POST':
         mailbox = request.session.get('mailbox', '')
         user = User.objects.get(mailbox=mailbox)
