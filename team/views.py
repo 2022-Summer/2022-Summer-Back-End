@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from team.models import Team, Membership, Project
+from team.models import Team, Membership, Project, Invitation
 from user.models import User
 
 
@@ -64,13 +64,18 @@ def invite(request):
         if not User.objects.filter(mailbox=mailbox).exists():
             JsonResponse({'errno': 8001, 'msg': "该成员不存在"})
         user = User.objects.get(mailbox=mailbox)
+        mailbox = request.session.get('mailbox', '')
+        invitor = User.objects.get(mailbox=mailbox)
         team = Team.objects.get(id=team_id)
         if op == 0:
             if user in team.members.all():
                 return JsonResponse({'errno': 8002, ',msg': "该成员已在团队中"})
             else:
-                membership = Membership(team=team, user=user, status='普通成员')
-                membership.save()
+                invitation = Invitation()
+                invitation.user = user
+                invitation.team = team
+                invitation.invitor = invitor
+                invitation.save()
             return JsonResponse({'errno': 0, 'msg': "已发送邀请"})
         elif op == 1:
             membership = Membership.objects.get(team=team, user=user)

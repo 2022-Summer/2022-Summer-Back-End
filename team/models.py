@@ -23,3 +23,10 @@ class Project(models.Model):
     leader = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.CharField(max_length=255, default='')
     recycled = models.BooleanField(default=False)
+
+
+class Invitation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    invitor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='invitor')
+    invited_time = models.DateTimeField(auto_now_add=True)

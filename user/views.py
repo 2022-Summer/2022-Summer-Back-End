@@ -1,3 +1,4 @@
+from team.models import Invitation, Membership
 from user.models import User
 from django.core.mail import send_mail
 from django.http import JsonResponse
@@ -77,6 +78,7 @@ def sendMessage(mailbox):
     return rand_str
 
 
+@csrf_exempt
 def password(request):
     if request.method == 'POST':
         mailbox = request.POST.get('mailbox')
@@ -99,10 +101,10 @@ def password(request):
 
 @csrf_exempt
 def info(request):
-    user_id = int(request.session.get('id', 0))
-    if user_id == 0:
+    mailbox = request.session.get('mailbox', '')
+    if mailbox == '':
         return JsonResponse({'errno': 3001, 'msg': "用户未登录"})
-    user = User.objects.get(id=user_id)
+    user = User.objects.get(mailbox=mailbox)
     if request.method == 'POST':
         if request.POST.get('username'):
             user.username = request.POST.get('username')
@@ -114,6 +116,8 @@ def info(request):
             user.sex = request.POST.get('sex')
         if request.FILES.get('headshot'):
             user.headshot = request.FILES.get('headshot')
+        if request.POST.get('password'):
+            user.password = request.POST.get('password')
         user.save()
         return JsonResponse({'errno': 0, 'msg': "更改个人信息成功"})
     else:
@@ -127,3 +131,46 @@ def info(request):
             'headshot': user.photo_url()
         }
         return JsonResponse({'errno': 0, 'data': data})
+
+
+@csrf_exempt
+def invited_num(request):
+    if request.method == 'GET':
+        mailbox = request.session.get('mailbox', '')
+        user = User.objects.get(mailbox=mailbox)
+        invited_num = Invitation.objects.filter(user=user).count()
+        invitations = [{
+            'id': x.id,
+            'teamID': x.team_id,
+            'invitor': x.invitor.username,
+            'inviteTime': x.invited_time
+        } for x in Invitation.objects.filter(user=user)]
+        return JsonResponse({'errno': 0, 'invitednum': invited_num, 'myInvitations': invitations})
+    elif request.method == 'POST':
+        invitation_id = request.POST.get('id', 0)
+        op = int(request.POST.get('op', 0))
+        mailbox = request.session.get('mailbox', '')
+        user = User.objects.get(mailbox=mailbox)
+        invitation = Invitation.objects.get(id=invitation_id)
+        if op == 0:
+            membership = Membership()
+            membership.team = invitation.team
+            membership.status = "普通用户"
+            membership.user = user
+            membership.save()
+        invitation.delete()
+        return JsonResponse({'errno': 0, 'msg': "处理邀请成功"})
+
+
+@csrf_exempt
+def team_info(request):
+    if request.method == 'GET':
+        mailbox = request.session.get('mailbox', '')
+        user = User.objects.get(mailbox=mailbox)
+        teams = [{
+            'teamid': x.team.id,
+            'name': x.team.name,
+            'belong': Membership.objects.get(team=x.team, status='发起人').user.username,
+            'foundedTime': x.team.founded_time,
+        } for x in Membership.objects.filter(user=user)]
+        return JsonResponse({'errno': 0, 'myTeams': teams})
