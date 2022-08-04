@@ -11,6 +11,8 @@ def project_directory_path(instance, filename):
 class Word(models.Model):
     title = models.CharField(max_length=20)
     html = models.TextField(default='')
+    last_editor = models.ForeignKey(User, on_delete=models.CASCADE)
+    last_edit_time = models.DateTimeField(auto_now_add=True)
 
 
 class Document(models.Model):
@@ -19,3 +21,4 @@ class Document(models.Model):
     file = models.FileField(upload_to=project_directory_path, blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     uploader = models.ForeignKey(User, on_delete=models.CASCADE)
+    uploaded_time = models.DateTimeField(auto_now_add=True)

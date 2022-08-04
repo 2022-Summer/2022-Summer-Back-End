@@ -8,4 +8,6 @@ urlpatterns = [
     path('upload/', upload),
     path('download/', download),
     path('rename/', real_name),
+    path('file/', file_info),
+    path('doc/', doc),
 ]

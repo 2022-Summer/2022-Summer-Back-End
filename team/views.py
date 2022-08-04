@@ -113,6 +113,7 @@ def project(request):
         team_id = request.GET.get('teamid', 0)
         team = Team.objects.get(id=team_id)
         projects = [{
+            'id': x.id,
             'title': x.title,
             'startTime': x.start_time,
             'leader': x.leader.username,

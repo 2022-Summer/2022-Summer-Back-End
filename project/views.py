@@ -83,3 +83,30 @@ def real_name(request):
             project.title = new_name
             project.save()
         return JsonResponse({'errno': 0, 'msg': "重命名成功"})
+
+
+def file_info(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('projectid', 0)
+        project = Project.objects.get(id=project_id)
+        type = request.POST.get('type', 0)
+        file = [{
+            'id': x.id,
+            'title': x.title,
+            'lastEditTime': x.uploaded_time
+        } for x in Document.objects.filter(project=project, type=type)]
+        return JsonResponse({'errno': 0, 'msg': "查询文件信息成功", 'file': file})
+
+
+@csrf_exempt
+def doc(request):
+    if request.method == 'GET':
+        project_id = request.POST.get('projectid', 0)
+        project = Project.objects.get(id=project_id)
+        word = [{
+            'id': x.id,
+            'title': x.title,
+            'lastEditor': x.last_editor.username,
+            'lastEditTime': x.last_edit_time,
+        } for x in Word.objects.filter(project=project)]
+        return JsonResponse({'errno': 0, 'msg': "查询文档信息成功", 'word': word})
