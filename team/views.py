@@ -88,7 +88,7 @@ def invite(request):
 @csrf_exempt
 def admin(request):
     if request.method == 'POST':
-        op = request.POST.get('op', 0)
+        op = int(request.POST.get('op', 0))
         mailbox = request.POST.get('email', '')
         team_id = request.POST.get('teamid', 0)
         user = User.objects.get(mailbox=mailbox)
@@ -98,6 +98,7 @@ def admin(request):
             membership.status = '管理员'
         elif op == 1:
             membership.status = '普通用户'
+        membership.save()
         return JsonResponse({'errno': 0, 'msg': "更改成功"})
 
 
@@ -110,8 +111,8 @@ def project(request):
         team = Team.objects.get(id=team_id)
         projects = [{
             'title': x.title,
-            'startTime': x.startTime,
-            'leader': x.leader,
+            'startTime': x.start_time,
+            'leader': x.leader.username,
             'description': x.description,
         } for x in Project.objects.filter(team=team, recycled=False)]
         return JsonResponse({'errno': 0, 'msg': "获取项目信息成功", 'projects': projects})

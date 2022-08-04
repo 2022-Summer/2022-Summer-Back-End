@@ -84,7 +84,7 @@ def password(request):
         mailbox = request.POST.get('mailbox')
         if User.objects.filter(mailbox=mailbox).exists():
             if request.session.get('verification_code', 0) == request.POST.get('code'):
-                return JsonResponse({'errno': 0, 'password': User.objects.get(mailbox=mailbox)})
+                return JsonResponse({'errno': 0, 'password': User.objects.get(mailbox=mailbox).password})
             else:
                 return JsonResponse({'errno': 4002, 'msg': "验证码错误"})
         else:
@@ -124,7 +124,7 @@ def info(request):
         data = {
             'mailbox': user.mailbox,
             'username': user.username,
-            'real_name': user.real_name,
+            'name': user.real_name,
             'description': user.description,
             'sex': user.sex,
             'password': user.password,
