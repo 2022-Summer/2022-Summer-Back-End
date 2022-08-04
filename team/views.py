@@ -125,7 +125,7 @@ def recycle(request):
         project_id = request.POST.get('projectid', 0)
         team = Team.objects.get(id=team_id)
         project = Project.objects.get(id=project_id)
-        op = request.POST.get('op', 0)
+        op = int(request.POST.get('op', 0))
         if op == 0:
             project.recycled = True
             project.save()
@@ -134,12 +134,13 @@ def recycle(request):
             project.save()
         else:
             project.delete()
+        return JsonResponse({'errno': 0, 'msg': "操作成功"})
     else:
         team_id = request.GET.get('teamid')
         team = Team.objects.get(id=team_id)
         recycles = [{
             'title': x.title,
-            'startTime': x.startTime,
-            'leader': x.leader,
+            'startTime': x.start_time,
+            'leader': x.leader.username,
         } for x in Project.objects.filter(team=team, recycled=True)]
         return JsonResponse({'errno': 0, 'msg': "获取项目信息成功", 'Recycle': recycles})
