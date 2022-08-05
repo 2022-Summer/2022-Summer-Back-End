@@ -7,7 +7,9 @@ urlpatterns = [
     path('word/', word),
     path('upload/', upload),
     path('download/', download),
-    path('rename/', real_name),
+    path('rename/', re_name),
     path('file/', file_info),
     path('doc/', doc),
+    path('delete/', delete_doc),
+    path('deword/', delete_word),
 ]

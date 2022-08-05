@@ -171,3 +171,14 @@ EMAIL_FROM = 'moshu'# 收件人看到的发件人
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_USE_TLS = True   #是否使用TLS安全传输协议
 #EMAIL_USE_SSL = True    #是否使用SSL加密，qq企业邮箱要求使用
+
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'Asia/Shanghai'
+
+USE_I18N = True
+
+USE_L10N = True
+
+USE_TZ = False

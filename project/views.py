@@ -27,12 +27,15 @@ def word(request):
         if word_id == 0:
             project_id = request.GET.get('projectid', 0)
             project = Project.objects.get(id=project_id)
+            mailbox = request.session.get('mailbox', '')
+            user = User.objects.get(mailbox=mailbox)
             word = Word()
+            word.last_editor = user
             word.project = project
             word.save()
         else:
             word = Word.objects.get(id=word_id)
-        return JsonResponse({'errno': 0, 'wordid': word.id, 'html': word.html})
+        return JsonResponse({'errno': 0, 'wordid': word.id, 'title': word.title,'html': word.html})
     elif request.method == 'POST':
         word_id = request.POST.get('wordid', 0)
         word = Word.objects.get(id=word_id)
@@ -54,13 +57,21 @@ def upload(request):
         mailbox = request.session.get('mailbox', '')
         user = User.objects.get(mailbox=mailbox)
         type = request.POST.get('type', 0)
-        doc = Document()
-        doc.title = request.POST.get('title', '')
-        doc.type = type
-        doc.project = project
-        doc.uploader = user
-        doc.file = request.FILES.get('file')
-        doc.save()
+
+        file = request.FILES.get('file')
+        if Document.objects.filter(title=file.name).exists():
+            doc = Document.objects.get(title=file.name)
+            doc.file.delete()
+            doc.file = file
+            doc.save()
+        else:
+            doc = Document()
+            doc.title = file.name
+            doc.type = type
+            doc.project = project
+            doc.uploader = user
+            doc.file = file
+            doc.save()
         return JsonResponse({'errno': 0, 'msg': "上传成功"})
 
 
@@ -73,7 +84,7 @@ def download(request):
 
 
 @csrf_exempt
-def real_name(request):
+def re_name(request):
     if request.method == 'POST':
         project_id = request.POST.get('projectid', 0)
         new_name = request.POST.get('newname', '')
@@ -86,8 +97,8 @@ def real_name(request):
 
 
 def file_info(request):
-    if request.method == 'POST':
-        project_id = request.POST.get('projectid', 0)
+    if request.method == 'GET':
+        project_id = request.GET.get('projectid', 0)
         project = Project.objects.get(id=project_id)
         type = request.POST.get('type', 0)
         file = [{
@@ -110,3 +121,21 @@ def doc(request):
             'lastEditTime': x.last_edit_time,
         } for x in Word.objects.filter(project=project)]
         return JsonResponse({'errno': 0, 'msg': "查询文档信息成功", 'word': word})
+
+
+@csrf_exempt
+def delete_doc(request):
+    if request.method == 'POST':
+        doc_id = request.POST.get('fileid', 0)
+        doc = Document.objects.get(id=doc_id)
+        doc.file.delete()
+        doc.delete()
+        return JsonResponse({'errno': 0, 'msg': "删除成功"})
+
+
+def delete_word(request):
+    if request.method == 'POST':
+        word_id = request.POST.get('wordid', 0)
+        word = Word.objects.get(id=word_id)
+        word.delete()
+        return JsonResponse({'errno': 0, 'msg': "删除成功"})
