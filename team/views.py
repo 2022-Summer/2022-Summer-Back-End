@@ -14,7 +14,7 @@ def team_info(request):
         data = {
             'teamname': team.name,
             'belong': Membership.objects.get(team=team, status="发起人").user.username,
-            'foundedtime': team.founded_time,
+            'foundedtime': team.founded_time.strftime("%Y-%m-%d %H:%M:%S"),
             'memberNum': team.members.all().count(),
             'intro': team.intro,
         }
@@ -33,6 +33,7 @@ def member_info(request):
             'email': x.mailbox,
             'status': Membership.objects.get(team=team, user=x).status,
             'description': x.description,
+            'sex': x.sex,
         } for x in team.members.all()]
         mailbox = request.session.get('mailbox', 0)
         user = User.objects.get(mailbox=mailbox)
@@ -113,8 +114,9 @@ def project(request):
         team_id = request.GET.get('teamid', 0)
         team = Team.objects.get(id=team_id)
         projects = [{
+            'id': x.id,
             'title': x.title,
-            'startTime': x.start_time,
+            'startTime': x.start_time.strftime("%Y-%m-%d %H:%M:%S"),
             'leader': x.leader.username,
             'description': x.description,
         } for x in Project.objects.filter(team=team, recycled=False)]
@@ -143,7 +145,8 @@ def recycle(request):
         team = Team.objects.get(id=team_id)
         recycles = [{
             'title': x.title,
-            'startTime': x.start_time,
+            'startTime': x.start_time.strftime("%Y-%m-%d %H:%M:%S"),
             'leader': x.leader.username,
+            'id': x.id,
         } for x in Project.objects.filter(team=team, recycled=True)]
         return JsonResponse({'errno': 0, 'msg': "获取项目信息成功", 'Recycle': recycles})
