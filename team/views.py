@@ -121,7 +121,7 @@ def project(request):
             'startTime': x.start_time.strftime("%Y-%m-%d %H:%M:%S"),
             'leader': x.leader.username,
             'description': x.description,
-        } for x in Project.objects.filter(team=team, recycled=False)]
+        } for x in Project.objects.filter(team=team, recycled=False).order_by('-start_time')]
         return JsonResponse({'errno': 0, 'msg': "获取项目信息成功", 'projects': projects})
 
 
