@@ -17,7 +17,7 @@ class Word(models.Model):
 
 
 class Document(models.Model):
-    title = models.CharField(max_length=100, unique=True)
+    title = models.CharField(max_length=100)
     type = models.BooleanField()
     file = models.FileField(upload_to=project_directory_path, blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
