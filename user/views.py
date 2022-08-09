@@ -143,7 +143,7 @@ def invited_num(request):
             'id': x.id,
             'teamID': x.team_id,
             'invitor': x.invitor.username,
-            'inviteTime': x.invited_time
+            'inviteTime': x.invited_time.strftime("%Y-%m-%d %H:%M:%S"),
         } for x in Invitation.objects.filter(user=user)]
         return JsonResponse({'errno': 0, 'invitednum': invited_num, 'myInvitations': invitations})
     elif request.method == 'POST':

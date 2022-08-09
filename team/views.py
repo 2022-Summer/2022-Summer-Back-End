@@ -1,7 +1,9 @@
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
+from project.models import Word
 from team.models import Team, Membership, Project, Invitation
 from user.models import User
 
@@ -119,7 +121,7 @@ def project(request):
             'startTime': x.start_time.strftime("%Y-%m-%d %H:%M:%S"),
             'leader': x.leader.username,
             'description': x.description,
-        } for x in Project.objects.filter(team=team, recycled=False)]
+        } for x in Project.objects.filter(team=team, recycled=False).order_by('-start_time')]
         return JsonResponse({'errno': 0, 'msg': "获取项目信息成功", 'projects': projects})
 
 
@@ -150,3 +152,39 @@ def recycle(request):
             'id': x.id,
         } for x in Project.objects.filter(team=team, recycled=True)]
         return JsonResponse({'errno': 0, 'msg': "获取项目信息成功", 'Recycle': recycles})
+
+
+@csrf_exempt
+def search(request):
+    if request.method == 'POST':
+        team_id = request.POST.get('teamid', 0)
+        keyword = request.POST.get('keyword', '')
+        team = Team.objects.get(id=team_id)
+        print(keyword)
+        projects = [{
+            'id': x.id,
+            'title': x.title,
+            'startTime': x.start_time,
+            'leader': x.leader.username,
+        } for x in Project.objects.filter(Q(team=team), Q(title__icontains=keyword) |
+                                          Q(leader__username__icontains=keyword) |
+                                          Q(description__icontains=keyword))]
+        return JsonResponse({'errno': 0, 'msg': "搜索成功", 'projects': projects})
+
+
+@csrf_exempt
+def get_word(request):
+    if request.method == 'GET':
+        team_id = request.GET.get('teamid', 0)
+        team = Team.objects.get(id=team_id)
+        projects = [{
+            'projectid': x.id,
+            'label': x.title,
+            'children': [{
+                'wordid': y.id,
+                'label': y.title,
+                'lastEditor': y.last_editor.username,
+                'lastEditTime': y.last_edit_time.strftime("%Y-%m-%d %H:%M:%S"),
+            } for y in Word.objects.filter(project=x)]
+        } for x in Project.objects.filter(team=team)]
+        return JsonResponse({'errno': 0, 'msg': "获取文档信息成功", 'Files': projects})

@@ -13,4 +13,5 @@ urlpatterns = [
     path('delete/', delete_doc),
     path('deword/', delete_word),
     path('downloadword/', downloadword),
+    path('copy/', copy_project),
 ]

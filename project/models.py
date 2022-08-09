@@ -1,5 +1,3 @@
-from django.utils import timezone
-
 from django.db import models
 
 from team.models import Project
@@ -13,15 +11,15 @@ def project_directory_path(instance, filename):
 class Word(models.Model):
     title = models.CharField(max_length=20)
     html = models.TextField(default='')
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     last_editor = models.ForeignKey(User, on_delete=models.CASCADE)
-    last_edit_time = models.DateTimeField('修改时间',default = timezone.now)
+    last_edit_time = models.DateTimeField(auto_now_add=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
 
 class Document(models.Model):
-    title = models.CharField(max_length=100, unique=True)
+    title = models.CharField(max_length=100)
     type = models.BooleanField()
     file = models.FileField(upload_to=project_directory_path, blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     uploader = models.ForeignKey(User, on_delete=models.CASCADE)
-    uploaded_time = models.DateTimeField('保存时间',default = timezone.now)
+    uploaded_time = models.DateTimeField(auto_now_add=True)

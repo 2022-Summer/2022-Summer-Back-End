@@ -10,4 +10,6 @@ urlpatterns = [
     path('admin/', admin),
     path('project/', project),
     path('recycle/', recycle),
+    path('search/', search),
+    path('wordcenter/', get_word),
 ]
