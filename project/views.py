@@ -1,3 +1,5 @@
+import pdfkit
+import html2markdown
 from django.http import JsonResponse, FileResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -37,7 +39,7 @@ def word(request):
             word = Word.objects.get(id=word_id)
             word.last_editor = User.objects.get(mailbox=request.session.get("mailbox"))
             word.save()
-        return JsonResponse({'errno': 0, 'wordid': word.id, 'title': word.title,'html': word.html})
+        return JsonResponse({'errno': 0, 'wordid': word.id, 'title': word.title, 'html': word.html})
     elif request.method == 'POST':
         word_id = request.POST.get('wordid', 0)
         word = Word.objects.get(id=word_id)
@@ -83,6 +85,41 @@ def download(request):
         doc_id = int(request.GET.get('fileid'))
         doc = Document.objects.get(id=doc_id)
         return FileResponse(open(str(doc.file), 'rb'), as_attachment=True)
+
+
+@csrf_exempt
+def downloadword(request):
+    if request.method == 'GET':
+        word_id = int(request.GET.get('wordid', 0))
+        word = Word.objects.get(id=word_id)
+        filetype = int(request.GET.get('type', 0))
+        if filetype == 1:
+            path_wk = r'D:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # 安装位置
+            config = pdfkit.configuration(wkhtmltopdf=path_wk)
+            options = {
+                'page-size': 'A4',
+                'header-html': 'http://localhost:8080/static/data/pdfHeader.html',
+                # 设置页眉数据，作为页眉的html页面必须有<!DOCTYPE html>
+                'header-spacing': '3',  # 设置页眉与正文之间的距离，单位是毫米
+                'header-right': 'Quality Report',  # 设置页眉右侧数据
+                'header-font-size': 10,  # 设置页眉字体大小
+                'footer-font-size': 10,  # 设置页脚字体大小
+                'footer-right': '[page]/[topage]',
+                'margin-top': '0.75in',
+                'margin-right': '0.75in',
+                'margin-bottom': '0.5in',
+                'margin-left': '0.75in',
+                'encoding': "UTF-8",
+                # 'no-outline': None, #为None时表示确定，则不生成目录
+                'header-line': None,  # 为None时表示确定，生成页眉下的线
+            }
+            pdfkit.from_string(word.html, './test.pdf', options=options, configuration=config)
+            return FileResponse(open('./test.pdf', 'rb'), as_attachment=True)
+        elif filetype == 2:
+            markdown = html2markdown.convert(word.html)
+            with open('test.md', 'w', encoding='utf-8') as file:
+                file.write(markdown)
+            return FileResponse(open('./test.md', 'rb'), as_attachment=True)
 
 
 @csrf_exempt
@@ -133,6 +170,7 @@ def delete_doc(request):
         doc.file.delete()
         doc.delete()
         return JsonResponse({'errno': 0, 'msg': "删除成功"})
+
 
 @csrf_exempt
 def delete_word(request):
