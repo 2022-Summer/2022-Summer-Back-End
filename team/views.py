@@ -177,13 +177,13 @@ def get_word(request):
         team_id = request.GET.get('teamid', 0)
         team = Team.objects.get(id=team_id)
         projects = [{
-            'id': x.id,
+            'projectid': x.id,
             'title': x.title,
-            'word': [{
-                'id': y.id,
-                'title': y.title,
+            'children': [{
+                'wordid': y.id,
+                'label': y.title,
                 'lastEditor': y.last_editor.username,
                 'lastEditTime': y.last_edit_time.strftime("%Y-%m-%d %H:%M:%S"),
             } for y in Word.objects.filter(project=x)]
         } for x in Project.objects.filter(team=team)]
-        return JsonResponse({'errno': 0, 'msg': "获取文档信息成功", 'projects': projects})
+        return JsonResponse({'errno': 0, 'msg': "获取文档信息成功", 'Files': projects})
