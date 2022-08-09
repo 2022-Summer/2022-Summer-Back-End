@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.http import JsonResponse, FileResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from html2text import html2text
 
 from project.models import Word, Document, project_directory_path
 from team.models import Team, Project
@@ -182,3 +183,16 @@ def copy_project(request):
 
         return JsonResponse({'errno': 0, 'msg': "复制成功"})
 
+
+@csrf_exempt
+def download_word(request):
+    if request.method == 'GET':
+        word_id = request.GET.get('wordid', 0)
+        type = int(request.GET.get('type', 0))
+        word = Word.objects.get(id=word_id)
+        if type == 2:
+            markdown = html2text(word.html)
+            file = open(str(word.title) + '.md', 'w', encoding='utf-8')
+            file.write(markdown)
+            file.close()
+            return FileResponse(open(str(word.title) + '.md', 'rb'), as_attachment=True)
