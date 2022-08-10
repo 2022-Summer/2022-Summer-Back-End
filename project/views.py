@@ -307,3 +307,15 @@ def change_preview(request):
                 x.preview = False
                 x.save()
         return JsonResponse({'errno': 0, 'msg': "更改成功"})
+
+
+@csrf_exempt
+def preview_info(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('projectid', 0)
+        project = Project.objects.get(id=project_id)
+        prototypes = [{
+            'axureid': x.id,
+            'label': x.title,
+        } for x in Axure.objects.filter(project=project)]
+        return JsonResponse({'errno': 0, 'msg': "获取成功", 'prototypes': prototypes})

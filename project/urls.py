@@ -20,4 +20,5 @@ urlpatterns = [
     path('deleteaxure/', delete_axure),
     path('preview/', preview_axure),
     path('change/', change_preview),
+    path('previewlist/', preview_info)
 ]
