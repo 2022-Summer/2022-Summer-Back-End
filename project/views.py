@@ -278,3 +278,32 @@ def delete_axure(request):
             return JsonResponse({'errno': 0, 'msg': '删除成功'})
         except:
             return JsonResponse({'errno': 12001, 'msg': "删除失败"})
+
+
+@csrf_exempt
+def preview_axure(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('projectid', 0)
+        axure_id = request.POST.get('axureid', 0)
+        axure = Axure.objects.get(id=axure_id)
+        if axure.preview:
+            return JsonResponse({'errno': 0, 'msg': "预览成功", 'axureContent': axure.content})
+        else:
+            return JsonResponse({'errno': 0, 'msg': "该项目未开启预览"})
+
+
+@csrf_exempt
+def change_preview(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('projectid', 0)
+        op = int(request.POST.get('op', 0))
+        project = Project.objects.get(id=project_id)
+        if op == 0:
+            for x in Axure.objects.filter(project=project):
+                x.preview = True
+                x.save()
+        elif op == 1:
+            for x in Axure.objects.filter(project=project):
+                x.preview = False
+                x.save()
+        return JsonResponse({'errno': 0, 'msg': "更改成功"})

@@ -28,6 +28,7 @@ class Document(models.Model):
 class Axure(models.Model):
     title = models.CharField(max_length=100, default='')
     content = models.TextField(default='')
+    preview = models.BooleanField(default=False)
     last_editor = models.ForeignKey(User, on_delete=models.CASCADE)
     last_edit_time = models.DateTimeField(auto_now_add=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
