@@ -6,7 +6,7 @@ import html2markdown
 from django.http import JsonResponse, FileResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from project.models import Word, Document
+from project.models import Word, Document, Axure
 from team.models import Team, Project
 from user.models import User
 
@@ -218,3 +218,63 @@ def download_word(request):
             with open('resource/tmp/' + str(word.title) + '.md', 'w', encoding='utf-8') as file:
                 file.write(markdown)
             return FileResponse(open('resource/tmp/' + str(word.title) + '.md','rb'), as_attachment=True)
+
+
+@csrf_exempt
+def axure_info(request):
+    if request.method == 'GET':
+        project_id = request.GET.get('projectid', 0)
+        project = Project.objects.get(id=project_id)
+        axures = [{
+            'id': x.id,
+            'title': x.title,
+            'lastEditTime': x.last_edit_time,
+        } for x in Axure.objects.filter(project=project)]
+        return JsonResponse({'errno': 0, 'msg': "查询成功", 'file': axures})
+
+
+@csrf_exempt
+def view_axure(request):
+    if request.method == 'POST':
+        mailbox = request.session.get('mailbox', '')
+        user = User.objects.get(mailbox=mailbox)
+        axure_id = int(request.POST.get('axureID', 0))
+        project_id = request.POST.get('projectid', 0)
+        project = Project.objects.get(id=project_id)
+        if axure_id == 0:
+            axure = Axure()
+            axure.last_editor = user
+            axure.project = project
+            axure.save()
+        else:
+            axure = Axure.objects.get(id=axure_id)
+        return JsonResponse({'errno': 0, 'msg': "查询成功", 'axureID': axure.id, 'axureContent': axure.content})
+
+
+@csrf_exempt
+def save_axure(request):
+    if request.method == 'POST':
+        try:
+            mailbox = request.session.get('mailbox', '')
+            user = User.objects.get(mailbox=mailbox)
+            axure_id = request.POST.get('axureID', 0)
+            axure = Axure.objects.get(id=axure_id)
+            axure.title = request.POST.get('axurename')
+            axure.content = request.POST.get('axureData')
+            axure.last_editor = user
+            axure.save()
+            return JsonResponse({'errno': 0, 'msg': "保存成功"})
+        except:
+            return JsonResponse({'errno': 11001, 'msg': "保存失败"})
+
+
+@csrf_exempt
+def delete_axure(request):
+    if request.method == 'POST':
+        axure_id = request.POST.get('id', 0)
+        try:
+            axure = Axure.objects.get(id=axure_id)
+            axure.delete()
+            return JsonResponse({'errno': 0, 'msg': '删除成功'})
+        except:
+            return JsonResponse({'errno': 12001, 'msg': "删除失败"})
