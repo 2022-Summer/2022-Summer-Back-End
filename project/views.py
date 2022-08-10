@@ -1,13 +1,12 @@
 import os
 from shutil import copy
 
-from django.db.models import Q
+import pdfkit
+import html2markdown
 from django.http import JsonResponse, FileResponse
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from html2text import html2text
 
-from project.models import Word, Document, project_directory_path
+from project.models import Word, Document
 from team.models import Team, Project
 from user.models import User
 
@@ -187,12 +186,35 @@ def copy_project(request):
 @csrf_exempt
 def download_word(request):
     if request.method == 'GET':
-        word_id = request.GET.get('wordid', 0)
-        type = int(request.GET.get('type', 0))
+        word_id = int(request.GET.get('wordid', 0))
         word = Word.objects.get(id=word_id)
-        if type == 2:
-            markdown = html2text(word.html)
-            file = open(str(word.title) + '.md', 'w', encoding='utf-8')
-            file.write(markdown)
-            file.close()
-            return FileResponse(open(str(word.title) + '.md', 'rb'), as_attachment=True)
+        filetype = int(request.GET.get('type', 0))
+        for i in os.listdir('resource/tmp'):
+            os.remove('resource/tmp/' + i)
+        if filetype == 1:
+            path_wk = r'D:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # 安装位置
+            config = pdfkit.configuration(wkhtmltopdf=path_wk)
+            options = {
+                'page-size': 'A4',
+                'header-html': 'http://localhost:8080/static/data/pdfHeader.html',
+                # 设置页眉数据，作为页眉的html页面必须有<!DOCTYPE html>
+                'header-spacing': '3',  # 设置页眉与正文之间的距离，单位是毫米
+                'header-right': 'Quality Report',  # 设置页眉右侧数据
+                'header-font-size': 10,  # 设置页眉字体大小
+                'footer-font-size': 10,  # 设置页脚字体大小
+                'footer-right': '[page]/[topage]',
+                'margin-top': '0.75in',
+                'margin-right': '0.75in',
+                'margin-bottom': '0.5in',
+                'margin-left': '0.75in',
+                'encoding': "UTF-8",
+                # 'no-outline': None, #为None时表示确定，则不生成目录
+                'header-line': None,  # 为None时表示确定，生成页眉下的线
+            }
+            pdfkit.from_string(word.html, 'resource/tmp/' + str(word.title) + '.pdf', options=options, configuration=config)
+            return FileResponse(open('resource/tmp/' + str(word.title) + '.pdf', 'rb'), as_attachment=True)
+        elif filetype == 2:
+            markdown = html2markdown.convert(word.html)
+            with open('resource/tmp/' + str(word.title) + '.md', 'w', encoding='utf-8') as file:
+                file.write(markdown)
+            return FileResponse(open('resource/tmp/' + str(word.title) + '.md','rb'), as_attachment=True)
