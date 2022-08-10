@@ -228,7 +228,7 @@ def axure_info(request):
         axures = [{
             'id': x.id,
             'title': x.title,
-            'lastEditTime': x.last_edit_time,
+            'lastEditTime': x.last_edit_time.strftime("%Y-%m-%d %H:%M:%S"),
         } for x in Axure.objects.filter(project=project)]
         return JsonResponse({'errno': 0, 'msg': "查询成功", 'file': axures})
 
