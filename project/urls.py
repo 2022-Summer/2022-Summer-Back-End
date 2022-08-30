@@ -12,6 +12,14 @@ urlpatterns = [
     path('doc/', doc),
     path('delete/', delete_doc),
     path('deword/', delete_word),
-    path('downloadword/', downloadword),
     path('copy/', copy_project),
+    path('downloadword/', download_word),
+    path('view/', axure_info),
+    path('viewaxure/', view_axure),
+    path('axuresave/', save_axure),
+    path('deleteaxure/', delete_axure),
+    path('preview/', preview_axure),
+    path('change/', change_preview),
+    path('previewlist/', preview_info),
+    path('previewstate/',preview_state)
 ]

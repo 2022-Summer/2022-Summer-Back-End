@@ -160,13 +160,12 @@ def search(request):
         team_id = request.POST.get('teamid', 0)
         keyword = request.POST.get('keyword', '')
         team = Team.objects.get(id=team_id)
-        print(keyword)
         projects = [{
             'id': x.id,
             'title': x.title,
             'startTime': x.start_time,
             'leader': x.leader.username,
-        } for x in Project.objects.filter(Q(team=team), Q(title__icontains=keyword) |
+        } for x in Project.objects.filter(Q(recycled=False), Q(team=team), Q(title__icontains=keyword) |
                                           Q(leader__username__icontains=keyword) |
                                           Q(description__icontains=keyword))]
         return JsonResponse({'errno': 0, 'msg': "搜索成功", 'projects': projects})
